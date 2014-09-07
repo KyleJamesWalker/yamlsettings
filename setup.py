@@ -16,13 +16,13 @@ test_requirements = [
 ]
 
 setup(
-    name='YamlSettings',
+    name='yamlsettings',
     version='0.1.0',
     description='Yaml Settings Configuration Module',
     long_description=readme,
     author='Kyle James Walker',
     author_email='KyleJamesWalker@gmail.com',
-    url='http://github.com/KyleJamesWalker/YamlSettings',
+    url='https://github.com/KyleJamesWalker/yamlsettings',
     packages=['yamlsettings'],
     package_dir={'yamlsettings':
                  'yamlsettings'},
