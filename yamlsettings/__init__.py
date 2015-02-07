@@ -2,8 +2,8 @@
 from __future__ import print_function
 
 import os
-import yaml
 
+import yamldict
 from yamldict import YAMLDict, YAMLDictLoader
 
 
@@ -34,7 +34,7 @@ def load(filepaths, fields=[]):
     # Currently, all settings are loaded and then pruned out.
     # --------------------------------------------
     # load settings into a YAMLDict object
-    yaml_dict = YAMLDict(yaml.load(open(filepath), YAMLDictLoader))
+    yaml_dict = yamldict.load(open(filepath))
     # if set, limit the YAMLDict object to only the selected fields
     if fields:
         yaml_dict.limit(fields)
