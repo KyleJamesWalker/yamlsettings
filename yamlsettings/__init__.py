@@ -63,3 +63,27 @@ def update_from_env(yaml_dict):
             # replace value of the current settings path
             yaml_dict.inflate([(path, env_val)])
 
+
+def update_from_callback(yaml_dict, callback):
+    '''
+    Override YAML settings with retrun values from the specified callback function.
+
+        - callback function must be as follows:
+            def callback(path, value):
+                ...
+                do some processing
+                ...
+                return value
+
+            'value' contains setting value while 'path' contains the flattened path to the value.
+    '''
+    # get the flat structure from which environment variables are retrieved
+    yaml_flat = yaml_dict.flat()
+
+    # update settings
+    for path, value in yaml_flat:
+        # call the callback function
+        ret_val = callback(path, value)
+        if ret_val is not None:
+            # replace value of the current settings path
+            yaml_dict.inflate([(path, ret_val)])

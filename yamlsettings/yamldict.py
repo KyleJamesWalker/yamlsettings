@@ -98,7 +98,7 @@ class YAMLDict(collections.OrderedDict):
 
     # return the flat structure
     def flat(self):
-        def _traverse_node(path, node, yaml_flat):
+        def _flat_node(path, node, yaml_flat):
             if isinstance(node, YAMLDict):
                 for k, v in node.items():
                     _traverse_node(path + [k], v, yaml_flat)
