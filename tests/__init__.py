@@ -18,7 +18,8 @@ mock_files = {
         'config:\n'
         '  greet: Hello\n'
         '  leave: Goodbye\n'
-        '  secret: I have to secrets\n'
+        '  secret: I have no secrets\n'
+        '  meaning: 42'
     ),
     'settings.yml': (
         '---\n'
@@ -41,7 +42,39 @@ mock_files = {
         'config:\n'
         '  greet: Why hello good sir or mam.\n'
     ),
+    'fancy.yml': (
+        '---\n'
+        'test:\n'
+        '  id1: &id001\n'
+        '    name: hi\n'
+        '  id2: &id002\n'
+        '    name: hello\n'
+        '  test:\n'
+        '    - *id001\n'
+        '    - *id002\n'
+        '    - sub_test:\n'
+        '        a: 10\n'
+        '        b: *id001\n'
+        '    - sub_tester:\n'
+        '        name: jin\n'
+        '        set: [1, 2, 3]\n'
+        '  test2:\n'
+        '    message: hello there\n'
+        '---\n'
+        'test_2:\n'
+        '  test2:\n'
+        '    message: same here\n'
+        '    type: Test\n'
+        '---\n'
+        'test_3:\n'
+        '  test:\n'
+        '    name: Hello\n'
+     ),
 }
+
+
+def isfile_override(arg):
+    return arg in mock_files.keys()
 
 
 def path_override(arg):
@@ -59,3 +92,7 @@ def open_override(filename):
     mock_file.seek(0)
 
     return mock_file
+
+
+def get_secret():
+    return "s3cr3tz"

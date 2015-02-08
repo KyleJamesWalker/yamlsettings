@@ -7,16 +7,21 @@ import mock
 import unittest
 
 from yamlsettings import YamlSettings
-from . import builtin_module, path_override, open_override
+from . import builtin_module, path_override, open_override, isfile_override
 
 
 class YamlSettingsWithSectionsTestCase(unittest.TestCase):
 
     def setUp(self):
-        patcher = mock.patch('os.path.exists')
-        path_patch = patcher.start()
+        path_patcher = mock.patch('os.path.exists')
+        path_patch = path_patcher.start()
         path_patch.side_effect = path_override
-        self.addCleanup(patcher.stop)
+        self.addCleanup(path_patcher.stop)
+
+        isfile_patcher = mock.patch('os.path.isfile')
+        isfile_patch = isfile_patcher.start()
+        isfile_patch.side_effect = isfile_override
+        self.addCleanup(isfile_patcher.stop)
 
     @mock.patch('{}.open'.format(builtin_module))
     def test_settings_with_sections(self, open_patch):
@@ -170,14 +175,15 @@ class YamlSettingsWithSectionsTestCase(unittest.TestCase):
             {
                 'greet': 'Hello',
                 'leave': 'Goodbye',
-                'secret': 'I have many secrets'
+                'secret': 'I have many secrets',
+                'meaning': 42
             }
         )
 
         self.assertEqual(
             json.dumps(base_settings),
             '{"greet": "Hello", "leave": "Goodbye", '
-            '"secret": "I have many secrets"}'
+            '"secret": "I have many secrets", "meaning": 42}'
         )
 
     def test_all_without_override_file(self):

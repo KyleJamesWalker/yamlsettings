@@ -4,8 +4,6 @@ import yaml.constructor
 import collections
 
 
-# ==========================================================================================================
-
 class YAMLDict(collections.OrderedDict):
     '''
     Order-preserved, attribute-accessible dictionary object for YAML settings
@@ -15,7 +13,7 @@ class YAMLDict(collections.OrderedDict):
 
     def __init__(self, *args, **kwargs):
         super(YAMLDict, self).__init__(*args, **kwargs)
-        # reset types of all sub-nodes through the hiearchy
+        # Reset types of all sub-nodes through the hiearchy
         self.update(self)
 
     def __getattr__(self, k):
@@ -30,50 +28,56 @@ class YAMLDict(collections.OrderedDict):
         self[k] = v
 
     def __str__(self):
-        return yaml.safe_dump(self, stream=None, default_flow_style=False, encoding='utf-8')
+        return yaml.safe_dump(self, stream=None, default_flow_style=False,
+                              encoding='utf-8')
 
     def __repr__(self):
-        return '<' + ', '.join(['{}: {}'.format(repr(k), repr(v)) for k, v in self.items()]) + '>'
+        return '<' + ', '.join(['{}: {}'.format(repr(k), repr(v))
+                               for k, v in self.items()]) + '>'
 
-    # override the standard update() method
+    # Override the standard update() method
     def update(self, yaml_dict):
         def _update_node(base_node, update_node):
-                if isinstance(update_node, YAMLDict) or isinstance(update_node, dict):
+                if isinstance(update_node, YAMLDict) or \
+                        isinstance(update_node, dict):
                     if not (isinstance(base_node, YAMLDict)):
                         new_node = YAMLDict()
                     else:
                         new_node = base_node
                     for k, v in update_node.items():
                         new_node[k] = _update_node(new_node.get(k), v)
-                elif isinstance(update_node, list) or isinstance(update_node, tuple):
-                    # if not isinstance(base_node, list):
-                    #     new_node = []
-                    # else:
-                    #     new_node = base_node
-                    # NOTE: the whole list is replaced rather than appending an item
+                elif isinstance(update_node, list) or \
+                        isinstance(update_node, tuple):
+                    # NOTE: The whole list is replaced rather than appending
                     new_node = []
                     for v in update_node:
                         new_node.append(_update_node(None, v))
                 else:
                     new_node = update_node
                 return new_node
-        # convert non-YAMLDict objects to a YAMLDict
-        if not (isinstance(yaml_dict, YAMLDict) or isinstance(yaml_dict, dict)):
+        # Convert non-YAMLDict objects to a YAMLDict
+        if not (isinstance(yaml_dict, YAMLDict) or
+                isinstance(yaml_dict, dict)):
             yaml_dict = YAMLDict(yaml_dict)
         _update_node(self, yaml_dict)
 
-    # clone from another object
-    def clone(self, yaml_dict):
-        self.clear()
-        self.update(yaml_dict)
+    def clone(self):
+        ''' Creates and returns a new copy of self
+        '''
+        clone = YAMLDict()
+        clone.update(self)
+        return clone
 
-    # rebase from another object
     def rebase(self, yaml_dict):
-        base = YAMLDict(yaml_dict)
+        ''' Use yaml_dict as self's new base and update with existing
+            Reverse of update.
+        '''
+        base = yaml_dict.clone()
         base.update(self)
-        self.clone(base)
+        self.clear()
+        self.update(base)
 
-    # remove all keys other than the keys specified
+    # Remove all keys other than the keys specified
     def limit(self, keys):
         if not isinstance(keys, list) and not isinstance(keys, tuple):
             keys = [keys]
@@ -81,7 +85,8 @@ class YAMLDict(collections.OrderedDict):
         for k in remove_keys:
             self.pop(k)
 
-    # evaluate all *values* by calling the callback function and replace them with the return values
+    # Evaluate all *values* by calling the callback function and
+    # replace them with the return values
     def evaluate(self, callback):
         def _evaluate_node(node, callback):
             if isinstance(node, YAMLDict):
@@ -91,12 +96,12 @@ class YAMLDict(collections.OrderedDict):
                 for i, v in enumerate(node[:]):
                     node[i] = _evaluate_node(v, callback)
             else:
-                # replace a value with the return value of the callback function
+                # Replace value with the return value of the callback function
                 node = callback(node)
             return node
         _evaluate_node(self, callback)
 
-    # return the flat structure
+    # Return the flat structure
     def flat(self):
         def _traverse_node(path, node, yaml_flat):
             if isinstance(node, YAMLDict):
@@ -113,7 +118,7 @@ class YAMLDict(collections.OrderedDict):
         _traverse_node([], self, yaml_flat)
         return yaml_flat
 
-    # update from a flat structure
+    # Update from a flat structure
     def inflate(self, yaml_flat):
         for path, value in yaml_flat:
             cur_node = self
@@ -126,11 +131,10 @@ class YAMLDict(collections.OrderedDict):
                     cur_node[key] = value
 
 
-# add representer for YAMLDict
-yaml.representer.SafeRepresenter.add_representer(YAMLDict, yaml.representer.SafeRepresenter.represent_dict)
+# Add representer for YAMLDict
+yaml.representer.SafeRepresenter.add_representer(
+    YAMLDict, yaml.representer.SafeRepresenter.represent_dict)
 
-
-# ==========================================================================================================
 
 class YAMLDictLoader(yaml.Loader):
     '''
@@ -142,15 +146,18 @@ class YAMLDictLoader(yaml.Loader):
     def __init__(self, *args, **kwargs):
         yaml.Loader.__init__(self, *args, **kwargs)
         # override constructors for maps (i.e. dictionaries)
-        self.add_constructor(u'tag:yaml.org,2002:map', type(self).construct_yaml_map)
-        self.add_constructor(u'tag:yaml.org,2002:omap', type(self).construct_yaml_map)
+        self.add_constructor(u'tag:yaml.org,2002:map',
+                             type(self).construct_yaml_map)
+        self.add_constructor(u'tag:yaml.org,2002:omap',
+                             type(self).construct_yaml_map)
 
-    # method override to create YAMLDict rather than dict
+    # Method override to create YAMLDict rather than dict
     def construct_yaml_map(self, node):
         data = YAMLDict()
         yield data
         value = self.construct_mapping(node)
-        super(YAMLDict, data).update(value)     # we want to call the original update() function here
+        # Call the original update() function here to maintain YAMLDict
+        super(YAMLDict, data).update(value)
 
     # method override to create YAMLDict rather than dict
     def construct_mapping(self, node, deep=False):
@@ -177,7 +184,6 @@ class YAMLDictLoader(yaml.Loader):
             mapping[key] = value
         return mapping
 
-# ==========================================================================================================
 
 def load(stream):
     """
