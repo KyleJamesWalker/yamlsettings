@@ -28,8 +28,7 @@ class YAMLDict(collections.OrderedDict):
         self[k] = v
 
     def __str__(self):
-        return yaml.safe_dump(self, stream=None, default_flow_style=False,
-                              encoding='utf-8')
+        return yaml.safe_dump(self, stream=None, default_flow_style=False)
 
     def __repr__(self):
         return '<' + ', '.join(['{}: {}'.format(repr(k), repr(v))
