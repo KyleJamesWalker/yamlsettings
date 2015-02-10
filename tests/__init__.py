@@ -70,6 +70,26 @@ mock_files = {
         '  test:\n'
         '    name: Hello\n'
      ),
+    'single_fancy.yml': (
+        '---\n'
+        'test:\n'
+        '  id1: &id001\n'
+        '    name: hi\n'
+        '  id2: &id002\n'
+        '    name: hello\n'
+        '  var_list:\n'
+        '    - *id001\n'
+        '    - *id002\n'
+        '  dict_var_mix:\n'
+        '    a: 10\n'
+        '    b: *id001\n'
+        '  dict_with_list:\n'
+        '    name: jin\n'
+        '    set: [1, 2, 3]\n'
+        '  greeting:\n'
+        '    introduce: Hello there\n'
+        '    part: Till we meet again'
+    ),
 }
 
 

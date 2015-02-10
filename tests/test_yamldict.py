@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import mock
 import unittest
 
+from mock import mock_open
 from yamlsettings import load, update_from_env
 from yamlsettings.yamldict import load_all
 
@@ -46,7 +47,7 @@ class YamlDictTestCase(unittest.TestCase):
 
     @mock.patch.dict('os.environ', {
         'CONFIG_MEANING': '42.42',
-        'CONFIG_SECRET': '!!python/object/apply:tests.get_secret {args: []}'})
+        'CONFIG_SECRET': '!!python/object/apply:tests.get_secret []'})
     def test_load_with_envs(self):
         test_defaults = load('defaults.yml')
         update_from_env(test_defaults)
@@ -93,6 +94,60 @@ class YamlDictTestCase(unittest.TestCase):
                 self.assertEqual(cur_yml.test_3.test.name, 'Hello')
             section_count += 1
         self.assertEqual(section_count, 3)
+
+    # Note: Currently Failing
+    # Not allowing override of the variable.
+    @mock.patch.dict('os.environ', {
+        'TEST_GREETING_INTRODUCE': 'The environment says hello!',
+        'TEST_DICT_VAR_MIX_B': 'Goodbye Variable',
+    })
+    def test_variable_override(self):
+        test_settings = load("single_fancy.yml")
+        update_from_env(test_settings)
+        self.assertEqual(test_settings.test.greeting.introduce,
+                         'The environment says hello!')
+        self.assertEqual(test_settings.test.dict_var_mix.b,
+                         'Goodbye Variable')
+
+    # Note: Currently Failing
+    # Order not preserved
+    @mock.patch.dict('os.environ', {
+        'TEST_GREETING_INTRODUCE': 'The environment says hello!',
+    })
+    def test_file_writing(self):
+        test_settings = load("single_fancy.yml")
+        update_from_env(test_settings)
+
+        m = mock_open()
+        with mock.patch('{}.open'.format(builtin_module), m, create=True):
+            with open('current_file.yml', 'w') as h:
+                # yaml.dump() Adds !!python/... to the YAMLDict types
+                h.write(str(test_settings))
+
+        m.assert_called_once_with('current_file.yml', 'w')
+        handle = m()
+        handle.write.assert_called_once_with(
+            'test:\n'
+            '  id1: &id001\n'
+            '    name: hi\n'
+            '  id2: &id002\n'
+            '    name: hello\n'
+            '  var_list:\n'
+            '  - *id001\n'
+            '  - *id002\n'
+            '  dict_var_mix:\n'
+            '    a: 10\n'
+            '    b: *id001\n'
+            '  dict_with_list:\n'
+            '    name: jin\n'
+            '    set:\n'
+            '    - 1\n'
+            '    - 2\n'
+            '    - 3\n'
+            '  greeting:\n'
+            '    introduce: The environment says hello!\n'
+            '    part: Till we meet again'
+        )
 
 if __name__ == '__main__':
     unittest.main()
