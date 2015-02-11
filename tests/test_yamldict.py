@@ -76,7 +76,7 @@ class YamlDictTestCase(unittest.TestCase):
     def test_limit(self):
         test_settings = load('settings.yml')
         test_settings.limit(['config'])
-        self.assertEqual(test_settings.keys(), ['config'])
+        self.assertEqual(list(test_settings), ['config'])
 
     def test_clone_changes_isolated(self):
         test_settings = load('defaults.yml')
@@ -103,8 +103,7 @@ class YamlDictTestCase(unittest.TestCase):
         test_defaults = load('defaults.yml')
         update_from_file(test_defaults, 'settings.yml')
         self.assertEqual(test_defaults.config.secret, 'I have many secrets')
-        self.assertEqual(test_defaults.keys(), ['config'])
-
+        self.assertEqual(list(test_defaults), ['config'])
 
     @mock.patch.dict('os.environ', {
         'TEST_GREETING_INTRODUCE': 'The environment says hello!',

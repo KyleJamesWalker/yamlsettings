@@ -3,8 +3,7 @@ from __future__ import print_function
 
 import os
 
-import yamldict
-from yamldict import YAMLDict, YAMLDictLoader
+from yamlsettings import yamldict
 
 
 def _locate_file(filepaths):
@@ -77,7 +76,7 @@ def update_from_file(yaml_dict, filepaths):
         - File paths in the list gets the priority by their orders of the list.
     '''
     # load YAML settings with only fields in yaml_dict
-    yaml_dict.update(load(filepaths, yaml_dict.keys()))
+    yaml_dict.update(load(filepaths, list(yaml_dict)))
 
 
 def update_from_env(yaml_dict, prefix=""):
@@ -106,9 +105,10 @@ def update_from_env(yaml_dict, prefix=""):
     yaml_dict.traverse(_set_env_var)
 
 
-''' Preserved for backward compatibility
-'''
 class YamlSettings(object):
+    ''' Note you can easily get the same effect, with more flexibility
+        by using the functions above directly.
+    '''
     def __init__(self, default_settings, override_settings, override_envs=True,
                  default_section=None, cur_section=None,
                  param_callback=None, override_required=False,
@@ -163,25 +163,6 @@ class YamlSettings(object):
                 if override_envs and not envs_override_defaults_only:
                     update_from_env(self.settings[default_section],
                                     default_section)
-
-        # TODO: single_section_load
-        #  Add support to only load the single requested override, not all
-        #  aka no get_settings with section support as an option as this
-        #  could take some time if you had a very large amount of sections.
-
-        # TODO: param_callback
-        #  Allow detection of special sections, to build for example
-        #  connection strings
-        '''
-        # Create DB Connection Strings.
-        for cur_db in config[environment].databases:
-            try:
-                config[environment].databases[cur_db].conn_string = \
-                    get_connection_string(config[environment].
-                                          databases[cur_db])
-            except AttributeError:
-                print("Error {} is not a valid database entry".format(cur_db))
-        '''
 
     def get_settings(self, section_name=None):
         if section_name is None:

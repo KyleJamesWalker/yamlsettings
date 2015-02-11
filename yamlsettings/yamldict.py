@@ -112,7 +112,6 @@ class YAMLDict(collections.OrderedDict):
             self.pop(k)
 
 
-
 class YAMLDictLoader(yaml.Loader):
     '''
     Loader for YAMLDict object
@@ -187,7 +186,6 @@ def load_all(stream):
         loader.dispose()
 
 
-
 # Add representer for YAMLDict
 def _represent_YAMLDict(self, mapping):
     value = []
@@ -202,7 +200,8 @@ def _represent_YAMLDict(self, mapping):
         node_value = self.represent_data(item_value)
         if not (isinstance(node_key, yaml.ScalarNode) and not node_key.style):
             best_style = False
-        if not (isinstance(node_value, yaml.ScalarNode) and not node_value.style):
+        if not (isinstance(node_value, yaml.ScalarNode)
+                and not node_value.style):
             best_style = False
         value.append((node_key, node_value))
     if self.default_flow_style is not None:
