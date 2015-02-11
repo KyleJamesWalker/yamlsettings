@@ -9,12 +9,20 @@ simple environment variable support.
 
 Example setup
 ^^^^^^^^^^^^^
-Python Code::
+Python Code - Base Functions::
+
+ app_settings = load('defaults.yml')
+ update_from_env(test_settings)
+ update_from_file(app_defaults, 'settings.yml')
+ user = app_settings.myproj.databases.primary_sql.user
+
+Python Code - YamlSettings Helper Class::
 
  project_settings = YamlSettings('defaults.yml',
                                  'settings.yml',
                                  default_section='myproj')
  base_settings = project_settings.get_settings()
+ user = base_settings.databases.primary_sql.user
 
 defaults.yml - Default Settings for Project (tracked)::
 
