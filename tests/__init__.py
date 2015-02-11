@@ -19,7 +19,7 @@ mock_files = {
         '  greet: Hello\n'
         '  leave: Goodbye\n'
         '  secret: I have no secrets\n'
-        '  meaning: 42'
+        '  meaning: 42\n'
     ),
     'settings.yml': (
         '---\n'
@@ -88,8 +88,15 @@ mock_files = {
         '    set: [1, 2, 3]\n'
         '  greeting:\n'
         '    introduce: Hello there\n'
-        '    part: Till we meet again'
+        '    part: Till we meet again\n'
     ),
+    'stupid.yml': (
+        '---\n'
+        'test:\n'
+        '  config:\n'
+        '    db: MySQL\n'
+        '  config_db: YourSQL\n'
+    )
 }
 
 
@@ -101,7 +108,7 @@ def path_override(arg):
     return arg in mock_files.keys()
 
 
-def open_override(filename):
+def open_override(filename, mode='', buffering=-1):
     mock_file = StringIO()
 
     try:

@@ -34,8 +34,34 @@ class YAMLDict(collections.OrderedDict):
         return '<' + ', '.join(['{}: {}'.format(repr(k), repr(v))
                                for k, v in self.items()]) + '>'
 
-    # Override the standard update() method
+    def traverse(self, callback):
+        ''' Traverse through all keys and values (in-order)
+            and replace keys and values with the return values
+            from the callback function.
+        '''
+        def _traverse_node(path, node, callback):
+            ret_val = callback(path, node)
+            if ret_val is not None:
+                # replace node with the return value
+                node = ret_val
+            else:
+                # traverse deep into the hierarchy
+                if isinstance(node, YAMLDict):
+                    for k, v in node.items():
+                        node[k] = _traverse_node(path + [k], v,
+                                                 callback)
+                elif isinstance(node, list):
+                    for i, v in enumerate(node):
+                        node[i] = _traverse_node(path + ['[{}]'.format(i)], v,
+                                                 callback)
+                else:
+                    pass
+            return node
+        _traverse_node([], self, callback)
+
     def update(self, yaml_dict):
+        ''' Update the content (i.e. keys and values) with yaml_dict.
+        '''
         def _update_node(base_node, update_node):
                 if isinstance(update_node, YAMLDict) or \
                         isinstance(update_node, dict):
@@ -61,7 +87,7 @@ class YAMLDict(collections.OrderedDict):
         _update_node(self, yaml_dict)
 
     def clone(self):
-        ''' Creates and returns a new copy of self
+        ''' Creates and returns a new copy of self.
         '''
         clone = YAMLDict()
         clone.update(self)
@@ -69,70 +95,22 @@ class YAMLDict(collections.OrderedDict):
 
     def rebase(self, yaml_dict):
         ''' Use yaml_dict as self's new base and update with existing
-            Reverse of update.
+            reverse of update.
         '''
         base = yaml_dict.clone()
         base.update(self)
         self.clear()
         self.update(base)
 
-    # Remove all keys other than the keys specified
     def limit(self, keys):
+        ''' Remove all keys other than the keys specified.
+        '''
         if not isinstance(keys, list) and not isinstance(keys, tuple):
             keys = [keys]
         remove_keys = [k for k in self.keys() if k not in keys]
         for k in remove_keys:
             self.pop(k)
 
-    # Evaluate all *values* by calling the callback function and
-    # replace them with the return values
-    def evaluate(self, callback):
-        def _evaluate_node(node, callback):
-            if isinstance(node, YAMLDict):
-                for k, v in node.items():
-                    node[k] = _evaluate_node(v, callback)
-            elif isinstance(node, list):
-                for i, v in enumerate(node[:]):
-                    node[i] = _evaluate_node(v, callback)
-            else:
-                # Replace value with the return value of the callback function
-                node = callback(node)
-            return node
-        _evaluate_node(self, callback)
-
-    # Return the flat structure
-    def flat(self):
-        def _traverse_node(path, node, yaml_flat):
-            if isinstance(node, YAMLDict):
-                for k, v in node.items():
-                    _traverse_node(path + [k], v, yaml_flat)
-            elif isinstance(node, list):
-                # for i, v in enumerate(node):
-                #     _traverse_node(path + ['${}'.format(i)], v)
-                # NOTE: list node is not supported currently
-                pass
-            else:
-                yaml_flat += [(path, node)]
-        yaml_flat = []
-        _traverse_node([], self, yaml_flat)
-        return yaml_flat
-
-    # Update from a flat structure
-    def inflate(self, yaml_flat):
-        for path, value in yaml_flat:
-            cur_node = self
-            for i, key in enumerate(path):
-                if key not in cur_node:
-                    cur_node[key] = YAMLDict()
-                if i < len(path) - 1:
-                    cur_node = cur_node[key]
-                else:
-                    cur_node[key] = value
-
-
-# Add representer for YAMLDict
-yaml.representer.SafeRepresenter.add_representer(
-    YAMLDict, yaml.representer.SafeRepresenter.represent_dict)
 
 
 class YAMLDictLoader(yaml.Loader):
@@ -207,3 +185,30 @@ def load_all(stream):
             yield loader.get_data()
     finally:
         loader.dispose()
+
+
+
+# Add representer for YAMLDict
+def _represent_YAMLDict(self, mapping):
+    value = []
+    node = yaml.MappingNode(u'tag:yaml.org,2002:map', value, flow_style=None)
+    if self.alias_key is not None:
+        self.represented_objects[self.alias_key] = node
+    best_style = True
+    if hasattr(mapping, 'items'):
+        mapping = mapping.items()
+    for item_key, item_value in mapping:
+        node_key = self.represent_data(item_key)
+        node_value = self.represent_data(item_value)
+        if not (isinstance(node_key, yaml.ScalarNode) and not node_key.style):
+            best_style = False
+        if not (isinstance(node_value, yaml.ScalarNode) and not node_value.style):
+            best_style = False
+        value.append((node_key, node_value))
+    if self.default_flow_style is not None:
+        node.flow_style = self.default_flow_style
+    else:
+        node.flow_style = best_style
+    return node
+
+yaml.representer.SafeRepresenter.add_representer(YAMLDict, _represent_YAMLDict)

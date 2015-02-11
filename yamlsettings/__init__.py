@@ -3,9 +3,111 @@ from __future__ import print_function
 
 import os
 
-from yamlsettings import yamldict
+import yamldict
+from yamldict import YAMLDict, YAMLDictLoader
 
 
+def _locate_file(filepaths):
+    ''' Locate settings file from list of filepaths.
+    '''
+    if not isinstance(filepaths, list) and not isinstance(filepaths, tuple):
+        filepaths = [filepaths]
+    for filepath in filepaths:
+        filepath = os.path.expanduser(filepath)
+        if os.path.isfile(filepath):
+            break
+    else:
+        if len(filepaths) > 1:
+            raise IOError("unable to locate the settings file from:\n{}".
+                          format('\n'.join(filepaths)))
+        else:
+            raise IOError("unable to locate the settings file from: {}".
+                          format(filepaths))
+    return filepath
+
+
+def load(filepaths, fields=[]):
+    '''
+    Load YAML settings from a list of file paths given.
+
+        - File paths in the list gets the priority by their orders
+          of the list.
+        - If fields are set, only the selected fields are loaded in the
+          returned object. For example, fields=['users', 'hosts'] will
+          eliminate all of the other loaded fields except for them.
+    '''
+    filepath = _locate_file(filepaths)
+
+    # TODO:
+    # Add support to load the selected fields only.
+    # It could take some time if you had a very large amount of fields.
+    # Currently, all settings are loaded and then pruned out.
+    # --------------------------------------------
+    # load settings into a YAMLDict object
+    yaml_dict = yamldict.load(open(filepath))
+    # if set, limit the YAMLDict object to only the selected fields
+    if fields:
+        yaml_dict.limit(fields)
+    # --------------------------------------------
+
+    # return YAMLDict object
+    return yaml_dict
+
+
+def load_all(filepaths):
+    '''
+    Load *all* YAML settings from a list of file paths given.
+
+        - File paths in the list gets the priority by their orders
+          of the list.
+    '''
+    filepath = _locate_file(filepaths)
+
+    # load all settings into YAMLDict objects
+    yaml_dicts = yamldict.load_all(open(filepath))
+
+    # return YAMLDict objects
+    return yaml_dicts
+
+
+def update_from_file(yaml_dict, filepaths):
+    '''
+    Override YAML settings with loaded values from filepaths.
+
+        - File paths in the list gets the priority by their orders of the list.
+    '''
+    # load YAML settings with only fields in yaml_dict
+    yaml_dict.update(load(filepaths, yaml_dict.keys()))
+
+
+def update_from_env(yaml_dict, prefix=""):
+    '''
+    Override YAML settings with values from the environment variables.
+
+        - The letter '_' is delimit the hierarchy of the YAML settings such
+          that the value of 'config.databases.local' will be overridden
+          by CONFIG_DATABASES_LOCAL.
+    '''
+    def _set_env_var(path, node):
+        env_path = "{}{}{}".format(
+            prefix.upper(),
+            '_' if prefix else '',
+            '_'.join([str(key).upper() for key in path])
+        )
+        env_val = os.environ.get(env_path, None)
+        if env_val is not None:
+            # convert the value to a YAML-defined type
+            env_dict = yamldict.load('val: {}'.format(env_val))
+            return env_dict.val
+        else:
+            return None
+
+    # traverse yaml_dict with the callback function
+    yaml_dict.traverse(_set_env_var)
+
+
+''' Preserved for backward compatibility
+'''
 class YamlSettings(object):
     def __init__(self, default_settings, override_settings, override_envs=True,
                  default_section=None, cur_section=None,
@@ -89,68 +191,3 @@ class YamlSettings(object):
             return self.settings
         else:
             return self.settings[section_name]
-
-
-def load(filepaths, fields=[]):
-    '''
-    Load YAML settings from a list of file paths given.
-
-        - File paths in the list gets the priority by their orders of the list.
-        - If fields are set, only the selected fields are loaded in the
-          returned object. For example, fields=['users', 'hosts'] will
-          eliminate all of the other loaded fields except for them.
-    '''
-    # Locate settings file from list of filepaths
-    if not isinstance(filepaths, list) and not isinstance(filepaths, tuple):
-        filepaths = [filepaths]
-    for filepath in filepaths:
-        filepath = os.path.expanduser(filepath)
-        if os.path.isfile(filepath):
-            break
-    else:
-        if len(filepaths) > 1:
-            raise IOError("unable to locate the settings file from:\n{}".
-                          format('\n'.join(filepaths)))
-        else:
-            raise IOError("unable to locate the settings file from: {}".
-                          format(filepaths))
-    # TODO:
-    # Add support to load the selected fields only.
-    # It could take some time if you had a very large amount of fields.
-    # Currently, all settings are loaded and then pruned out.
-    # --------------------------------------------
-    # load settings into a YAMLDict object
-    yaml_dict = yamldict.load(open(filepath))
-    # if set, limit the YAMLDict object to only the selected fields
-    if fields:
-        yaml_dict.limit(fields)
-    # --------------------------------------------
-
-    # return YAMLDict object
-    return yaml_dict
-
-
-def update_from_env(yaml_dict, prefix=""):
-    '''
-    Override YAML settings with values from the environment variables.
-
-        - The letter '_' is delimit the hierarchy of the YAML settings such
-          that the value of 'config.databases.local' will be overridden
-          by CONFIG_DATABASES_LOCAL.
-    '''
-    # Get the flat structure from which environment variables are retrieved
-    yaml_flat = yaml_dict.flat()
-
-    # Update settings
-    for path, value in yaml_flat:
-        env_path = "{}{}{}".format(
-            prefix.upper(),
-            '_' if prefix else '',
-            '_'.join([str(key).upper() for key in path])
-        )
-        env_val = os.environ.get(env_path, None)
-        if env_val is not None:
-            # Convert environment based on yaml type
-            env_dict = yamldict.load('val: {}'.format(env_val))
-            # Replace value of the current settings path
-            yaml_dict.inflate([(path, env_dict.val)])

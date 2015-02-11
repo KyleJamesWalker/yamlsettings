@@ -6,8 +6,7 @@ import mock
 import unittest
 
 from mock import mock_open
-from yamlsettings import load, update_from_env
-from yamlsettings.yamldict import load_all
+from yamlsettings import load, load_all, update_from_env, update_from_file
 
 from . import builtin_module, path_override, open_override, isfile_override
 
@@ -74,6 +73,11 @@ class YamlDictTestCase(unittest.TestCase):
         self.assertEqual(test_settings.config.meaning, 42)
         self.assertEqual(test_settings.config_excited.greet, "Whazzzzup!")
 
+    def test_limit(self):
+        test_settings = load('settings.yml')
+        test_settings.limit(['config'])
+        self.assertEqual(test_settings.keys(), ['config'])
+
     def test_clone_changes_isolated(self):
         test_settings = load('defaults.yml')
         test_clone = test_settings.clone()
@@ -83,7 +87,7 @@ class YamlDictTestCase(unittest.TestCase):
 
     def test_load_all(self):
         section_count = 0
-        for cur_yml in load_all(open('fancy.yml')):
+        for cur_yml in load_all('fancy.yml'):
             if section_count is 0:
                 self.assertEqual(cur_yml.test.id1.name, 'hi')
                 self.assertEqual(cur_yml.test.test[2].sub_test.a, 10)
@@ -95,8 +99,13 @@ class YamlDictTestCase(unittest.TestCase):
             section_count += 1
         self.assertEqual(section_count, 3)
 
-    # Note: Currently Failing
-    # Not allowing override of the variable.
+    def test_update_from_file(self):
+        test_defaults = load('defaults.yml')
+        update_from_file(test_defaults, 'settings.yml')
+        self.assertEqual(test_defaults.config.secret, 'I have many secrets')
+        self.assertEqual(test_defaults.keys(), ['config'])
+
+
     @mock.patch.dict('os.environ', {
         'TEST_GREETING_INTRODUCE': 'The environment says hello!',
         'TEST_DICT_VAR_MIX_B': 'Goodbye Variable',
@@ -109,8 +118,17 @@ class YamlDictTestCase(unittest.TestCase):
         self.assertEqual(test_settings.test.dict_var_mix.b,
                          'Goodbye Variable')
 
-    # Note: Currently Failing
-    # Order not preserved
+    @mock.patch.dict('os.environ', {
+        'TEST_CONFIG_DB': 'OurSQL',
+    })
+    def test_stupid_override(self):
+        test_settings = load("stupid.yml")
+        update_from_env(test_settings)
+        self.assertEqual(test_settings.test.config.db,
+                         'OurSQL')
+        self.assertEqual(test_settings.test.config_db,
+                         'OurSQL')
+
     @mock.patch.dict('os.environ', {
         'TEST_GREETING_INTRODUCE': 'The environment says hello!',
     })
@@ -121,7 +139,6 @@ class YamlDictTestCase(unittest.TestCase):
         m = mock_open()
         with mock.patch('{}.open'.format(builtin_module), m, create=True):
             with open('current_file.yml', 'w') as h:
-                # yaml.dump() Adds !!python/... to the YAMLDict types
                 h.write(str(test_settings))
 
         m.assert_called_once_with('current_file.yml', 'w')
@@ -146,8 +163,9 @@ class YamlDictTestCase(unittest.TestCase):
             '    - 3\n'
             '  greeting:\n'
             '    introduce: The environment says hello!\n'
-            '    part: Till we meet again'
+            '    part: Till we meet again\n'
         )
+
 
 if __name__ == '__main__':
     unittest.main()
