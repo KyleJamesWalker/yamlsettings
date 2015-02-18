@@ -89,6 +89,11 @@ mock_files = {
         '  greeting:\n'
         '    introduce: Hello there\n'
         '    part: Till we meet again\n'
+        '  crazy:\n'
+        '    type: !!python/name:logging.handlers.SysLogHandler\n'
+        '    module: !!python/module:sys\n'
+        '    instance: !!python/object:tests.SoftwareEngineer\n'
+        '      name: jin\n'
     ),
     'stupid.yml': (
         '---\n'
@@ -98,6 +103,11 @@ mock_files = {
         '  config_db: YourSQL\n'
     )
 }
+
+
+class SoftwareEngineer(object):
+    def __init__(self, name):
+        self.name = name
 
 
 def isfile_override(arg):

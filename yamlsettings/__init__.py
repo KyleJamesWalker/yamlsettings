@@ -7,7 +7,8 @@ from yamlsettings import yamldict
 
 
 def _locate_file(filepaths):
-    ''' Locate settings file from list of filepaths.
+    '''
+    Locate settings file from list of filepaths.
     '''
     if not isinstance(filepaths, list) and not isinstance(filepaths, tuple):
         filepaths = [filepaths]
@@ -63,10 +64,26 @@ def load_all(filepaths):
     filepath = _locate_file(filepaths)
 
     # load all settings into YAMLDict objects
-    yaml_dicts = yamldict.load_all(open(filepath))
-
+    yaml_series = yamldict.load_all(open(filepath))
+    yaml_dicts = []
+    for yaml_dict in yaml_series:
+        yaml_dicts.append(yaml_dict)
     # return YAMLDict objects
     return yaml_dicts
+
+
+def save(yaml_dict, filepath):
+    '''
+    Save YAML settings to the specified file path.
+    '''
+    yamldict.dump(yaml_dict, open(filepath, 'w'), default_flow_style=False)
+
+
+def save_all(yaml_dicts, filepath):
+    '''
+    Save *all* YAML settings to the specified file path.
+    '''
+    yamldict.dump_all(yaml_dicts, open(filepath, 'w'), default_flow_style=False)
 
 
 def update_from_file(yaml_dict, filepaths):

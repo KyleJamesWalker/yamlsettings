@@ -6,7 +6,7 @@ import mock
 import unittest
 
 from mock import mock_open
-from yamlsettings import load, load_all, update_from_env, update_from_file
+from yamlsettings import load, load_all, save, save_all, update_from_env, update_from_file
 
 from . import builtin_module, path_override, open_override, isfile_override
 
@@ -99,6 +99,13 @@ class YamlDictTestCase(unittest.TestCase):
             section_count += 1
         self.assertEqual(section_count, 3)
 
+    def test_save_all(self):
+        cur_ymls = load_all('fancy.yml')
+        m = mock_open()
+        with mock.patch('{}.open'.format(builtin_module), m, create=True):
+            save_all(cur_ymls, 'out.yml')
+        m.assert_called_once_with('out.yml', 'w')
+
     def test_update_from_file(self):
         test_defaults = load('defaults.yml')
         update_from_file(test_defaults, 'settings.yml')
@@ -142,7 +149,7 @@ class YamlDictTestCase(unittest.TestCase):
 
         m.assert_called_once_with('current_file.yml', 'w')
         handle = m()
-        handle.write.assert_called_once_with(
+        handle.write.assert_called_with(
             'test:\n'
             '  id1: &id001\n'
             '    name: hi\n'
@@ -163,6 +170,11 @@ class YamlDictTestCase(unittest.TestCase):
             '  greeting:\n'
             '    introduce: The environment says hello!\n'
             '    part: Till we meet again\n'
+            '  crazy:\n'
+            '    type: !!python/name:logging.handlers.SysLogHandler \'\'\n'
+            '    module: !!python/module:sys \'\'\n'
+            '    instance: !!python/object:tests.SoftwareEngineer\n'
+            '      name: jin\n'
         )
 
 
