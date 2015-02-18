@@ -6,7 +6,8 @@ import mock
 import unittest
 
 from mock import mock_open
-from yamlsettings import load, load_all, save, save_all, update_from_env, update_from_file
+from yamlsettings import (load, load_all, save_all,
+                          update_from_env, update_from_file)
 
 from . import builtin_module, path_override, open_override, isfile_override
 

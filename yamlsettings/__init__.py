@@ -83,7 +83,8 @@ def save_all(yaml_dicts, filepath):
     '''
     Save *all* YAML settings to the specified file path.
     '''
-    yamldict.dump_all(yaml_dicts, open(filepath, 'w'), default_flow_style=False)
+    yamldict.dump_all(yaml_dicts, open(filepath, 'w'),
+                      default_flow_style=False)
 
 
 def update_from_file(yaml_dict, filepaths):

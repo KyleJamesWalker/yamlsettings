@@ -2,8 +2,6 @@
 import yaml
 import yaml.constructor
 import collections
-import types
-import copy_reg
 
 
 class YAMLDict(collections.OrderedDict):
@@ -192,7 +190,8 @@ class YAMLDictRepresenter(yaml.representer.Representer):
 
     def represent_YAMLDict(self, mapping):
         value = []
-        node = yaml.MappingNode(u'tag:yaml.org,2002:map', value, flow_style=None)
+        node = yaml.MappingNode(u'tag:yaml.org,2002:map',
+                                value, flow_style=None)
         if self.alias_key is not None:
             self.represented_objects[self.alias_key] = node
         best_style = True
@@ -201,7 +200,8 @@ class YAMLDictRepresenter(yaml.representer.Representer):
         for item_key, item_value in mapping:
             node_key = self.represent_data(item_key)
             node_value = self.represent_data(item_value)
-            if not (isinstance(node_key, yaml.ScalarNode) and not node_key.style):
+            if not (isinstance(node_key, yaml.ScalarNode) and
+                    not node_key.style):
                 best_style = False
             if not (isinstance(node_value, yaml.ScalarNode)
                     and not node_value.style):
@@ -215,7 +215,7 @@ class YAMLDictRepresenter(yaml.representer.Representer):
 
 
 YAMLDictRepresenter.add_representer(YAMLDict,
-        YAMLDictRepresenter.represent_YAMLDict)
+                                    YAMLDictRepresenter.represent_YAMLDict)
 
 
 class YAMLDictDumper(yaml.emitter.Emitter,
@@ -224,19 +224,23 @@ class YAMLDictDumper(yaml.emitter.Emitter,
                      yaml.resolver.Resolver):
 
     def __init__(self, stream,
-            default_style=None, default_flow_style=None,
-            canonical=None, indent=None, width=None,
-            allow_unicode=None, line_break=None,
-            encoding=None, explicit_start=None, explicit_end=None,
-            version=None, tags=None):
+                 default_style=None, default_flow_style=None,
+                 canonical=None, indent=None, width=None,
+                 allow_unicode=None, line_break=None,
+                 encoding=None, explicit_start=None, explicit_end=None,
+                 version=None, tags=None):
         yaml.emitter.Emitter.__init__(self, stream, canonical=canonical,
-                indent=indent, width=width,
-                allow_unicode=allow_unicode, line_break=line_break)
-        yaml.serializer.Serializer.__init__(self, encoding=encoding,
-                explicit_start=explicit_start, explicit_end=explicit_end,
-                version=version, tags=tags)
+                                      indent=indent, width=width,
+                                      allow_unicode=allow_unicode,
+                                      line_break=line_break)
+        yaml.serializer.Serializer.__init__(self,
+                                            encoding=encoding,
+                                            explicit_start=explicit_start,
+                                            explicit_end=explicit_end,
+                                            version=version,
+                                            tags=tags)
         YAMLDictRepresenter.__init__(self, default_style=default_style,
-                default_flow_style=default_flow_style)
+                                     default_flow_style=default_flow_style)
         yaml.resolver.Resolver.__init__(self)
 
 
@@ -254,4 +258,3 @@ def dump_all(data_list, stream=None, **kwds):
     If stream is None, return the produced string instead.
     """
     return yaml.dump_all(data_list, stream, Dumper=YAMLDictDumper, **kwds)
-
