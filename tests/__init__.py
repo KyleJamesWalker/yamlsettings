@@ -103,14 +103,15 @@ mock_files = {
         '  config_db: YourSQL\n'
     ),
     'merge.yml': (
-        'before: &org\n'
-        '  a: A\n'
-        '  b: B\n'
-        '  c: C\n'
-        'after:\n'
-        '  <<: *org\n'
-        '  c: X\n'
-    )
+        '---\n'
+        'base: &base_settings\n'
+        '  config:\n'
+        '    db: MySQL\n'
+        '  whoami: base\n'
+        'merged:\n'
+        '  <<: *base_settings\n'
+        '  whoami: merged\n'
+    ),
 }
 
 

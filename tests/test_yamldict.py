@@ -136,12 +136,6 @@ class YamlDictTestCase(unittest.TestCase):
         self.assertEqual(test_settings.test.config_db,
                          'OurSQL')
 
-    def test_merge(self):
-        test_settings = load("merge.yml")
-        self.assertEqual(test_settings.after.a, 'A')
-        self.assertEqual(test_settings.after.b, 'B')
-        self.assertEqual(test_settings.after.c, 'X')
-
     @mock.patch.dict('os.environ', {
         'TEST_GREETING_INTRODUCE': 'The environment says hello!',
     })
@@ -183,6 +177,17 @@ class YamlDictTestCase(unittest.TestCase):
             '    instance: !!python/object:tests.SoftwareEngineer\n'
             '      name: jin\n'
         )
+
+    def test_yaml_dict_merge(self):
+        test_settings = load("merge.yml")
+
+        # Verify the merge was successful
+        self.assertEqual(test_settings.base.config.db, "MySQL")
+        self.assertEqual(test_settings.merged.config.db, "MySQL")
+
+        # Verify whoami was properly overridden
+        self.assertEqual(test_settings.base.whoami, "base")
+        self.assertEqual(test_settings.merged.whoami, "merged")
 
 
 if __name__ == '__main__':
