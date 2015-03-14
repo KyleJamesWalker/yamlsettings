@@ -148,11 +148,7 @@ class YAMLDictLoader(yaml.Loader):
             )
         mapping = YAMLDict()
         for key_node, value_node in node.value:
-            try:
-                key = self.construct_object(key_node, deep=deep)
-            except Exception:
-                from pudb import set_trace
-                set_trace()
+            key = self.construct_object(key_node, deep=deep)
             try:
                 hash(key)
             except TypeError as exc:

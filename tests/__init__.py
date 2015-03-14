@@ -69,7 +69,7 @@ mock_files = {
         'test_3:\n'
         '  test:\n'
         '    name: Hello\n'
-     ),
+    ),
     'single_fancy.yml': (
         '---\n'
         'test:\n'
