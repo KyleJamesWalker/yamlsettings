@@ -69,7 +69,7 @@ mock_files = {
         'test_3:\n'
         '  test:\n'
         '    name: Hello\n'
-     ),
+    ),
     'single_fancy.yml': (
         '---\n'
         'test:\n'
@@ -101,7 +101,17 @@ mock_files = {
         '  config:\n'
         '    db: MySQL\n'
         '  config_db: YourSQL\n'
-    )
+    ),
+    'merge.yml': (
+        '---\n'
+        'base: &base_settings\n'
+        '  config:\n'
+        '    db: MySQL\n'
+        '  whoami: base\n'
+        'merged:\n'
+        '  <<: *base_settings\n'
+        '  whoami: merged\n'
+    ),
 }
 
 

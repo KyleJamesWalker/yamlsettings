@@ -178,6 +178,17 @@ class YamlDictTestCase(unittest.TestCase):
             '      name: jin\n'
         )
 
+    def test_yaml_dict_merge(self):
+        test_settings = load("merge.yml")
+
+        # Verify the merge was successful
+        self.assertEqual(test_settings.base.config.db, "MySQL")
+        self.assertEqual(test_settings.merged.config.db, "MySQL")
+
+        # Verify whoami was properly overridden
+        self.assertEqual(test_settings.base.whoami, "base")
+        self.assertEqual(test_settings.merged.whoami, "merged")
+
 
 if __name__ == '__main__':
     unittest.main()
