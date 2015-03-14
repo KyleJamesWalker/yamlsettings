@@ -66,6 +66,8 @@ class YAMLDict(collections.OrderedDict):
                 if isinstance(update_node, YAMLDict) or \
                         isinstance(update_node, dict):
                     if not (isinstance(base_node, YAMLDict)):
+                        # NOTE: A regular dictionay is replaced by a new
+                        #       YAMLDict object.
                         new_node = YAMLDict()
                     else:
                         new_node = base_node
@@ -73,10 +75,12 @@ class YAMLDict(collections.OrderedDict):
                         new_node[k] = _update_node(new_node.get(k), v)
                 elif isinstance(update_node, list) or \
                         isinstance(update_node, tuple):
-                    # NOTE: The whole list is replaced rather than appending
+                    # NOTE: A list/tuple is replaced by a new list/tuple.
                     new_node = []
                     for v in update_node:
                         new_node.append(_update_node(None, v))
+                    if isinstance(update_node, tuple):
+                        new_node = tuple(new_node)
                 else:
                     new_node = update_node
                 return new_node
