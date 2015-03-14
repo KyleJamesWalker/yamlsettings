@@ -136,6 +136,12 @@ class YamlDictTestCase(unittest.TestCase):
         self.assertEqual(test_settings.test.config_db,
                          'OurSQL')
 
+    def test_merge(self):
+        test_settings = load("merge.yml")
+        self.assertEqual(test_settings.after.a, 'A')
+        self.assertEqual(test_settings.after.b, 'B')
+        self.assertEqual(test_settings.after.c, 'X')
+
     @mock.patch.dict('os.environ', {
         'TEST_GREETING_INTRODUCE': 'The environment says hello!',
     })

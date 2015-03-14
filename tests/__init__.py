@@ -101,6 +101,15 @@ mock_files = {
         '  config:\n'
         '    db: MySQL\n'
         '  config_db: YourSQL\n'
+    ),
+    'merge.yml': (
+        'before: &org\n'
+        '  a: A\n'
+        '  b: B\n'
+        '  c: C\n'
+        'after:\n'
+        '  <<: *org\n'
+        '  c: X\n'
     )
 }
 

@@ -137,6 +137,8 @@ class YAMLDictLoader(yaml.Loader):
 
     # method override to create YAMLDict rather than dict
     def construct_mapping(self, node, deep=False):
+        if isinstance(node, yaml.MappingNode):
+            self.flatten_mapping(node)
         if not isinstance(node, yaml.MappingNode):
             raise yaml.constructor.ConstructorError(
                 None,
