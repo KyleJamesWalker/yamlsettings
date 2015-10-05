@@ -3,7 +3,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import json
-import mock
+import unittest.mock as mock
 import unittest
 
 from yamlsettings import YamlSettings

@@ -2,10 +2,10 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import mock
+import unittest.mock as mock
 import unittest
 
-from mock import mock_open
+from unittest.mock import mock_open
 from yamlsettings import (load, load_all, save_all,
                           update_from_env, update_from_file)
 
