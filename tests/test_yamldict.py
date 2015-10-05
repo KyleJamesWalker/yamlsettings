@@ -2,10 +2,14 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import unittest.mock as mock
 import unittest
-
-from unittest.mock import mock_open
+import sys
+if sys.version_info[0] < 3:
+    import mock
+    from mock import mock_open
+else:
+    import unittest.mock as mock
+    from unittest.mock import mock_open
 from yamlsettings import (load, load_all, save_all,
                           update_from_env, update_from_file)
 

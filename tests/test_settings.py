@@ -3,7 +3,11 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import json
-import unittest.mock as mock
+import sys
+if sys.version_info[0] < 3:
+    import mock
+else:
+    import unittest.mock as mock
 import unittest
 
 from yamlsettings import YamlSettings
