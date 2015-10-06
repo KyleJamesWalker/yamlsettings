@@ -1,3 +1,8 @@
+"""Copyright (c) 2015 Kyle James Walker
+
+See the file LICENSE for copying permission.
+
+"""
 # -*- coding: utf-8 -*-
 import yaml
 import yaml.constructor
