@@ -23,10 +23,10 @@ def _locate_file(filepaths):
             break
     else:
         if len(filepaths) > 1:
-            raise IOError("unable to locate the settings file from:\n{}".
+            raise IOError("unable to locate the settings file from:\n{0}".
                           format('\n'.join(filepaths)))
         else:
-            raise IOError("unable to locate the settings file from: {}".
+            raise IOError("unable to locate the settings file from: {0}".
                           format(filepaths))
     return filepath
 
@@ -111,7 +111,7 @@ def update_from_env(yaml_dict, prefix=""):
           by CONFIG_DATABASES_LOCAL.
     '''
     def _set_env_var(path, node):
-        env_path = "{}{}{}".format(
+        env_path = "{0}{1}{2}".format(
             prefix.upper(),
             '_' if prefix else '',
             '_'.join([str(key).upper() for key in path])
@@ -119,7 +119,7 @@ def update_from_env(yaml_dict, prefix=""):
         env_val = os.environ.get(env_path, None)
         if env_val is not None:
             # convert the value to a YAML-defined type
-            env_dict = yamldict.load('val: {}'.format(env_val))
+            env_dict = yamldict.load('val: {0}'.format(env_val))
             return env_dict.val
         else:
             return None

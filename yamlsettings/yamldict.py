@@ -36,7 +36,7 @@ class YAMLDict(collections.OrderedDict):
         return dump(self, stream=None, default_flow_style=False)
 
     def __repr__(self):
-        return '<' + ', '.join(['{}: {}'.format(repr(k), repr(v))
+        return '<' + ', '.join(['{0}: {1}'.format(repr(k), repr(v))
                                for k, v in self.items()]) + '>'
 
     def traverse(self, callback):
@@ -57,7 +57,7 @@ class YAMLDict(collections.OrderedDict):
                                                  callback)
                 elif isinstance(node, list):
                     for i, v in enumerate(node):
-                        node[i] = _traverse_node(path + ['[{}]'.format(i)], v,
+                        node[i] = _traverse_node(path + ['[{0}]'.format(i)], v,
                                                  callback)
                 else:
                     pass
@@ -152,7 +152,7 @@ class YAMLDictLoader(yaml.Loader):
             raise yaml.constructor.ConstructorError(
                 None,
                 None,
-                'expected a mapping node, but found {}'.format(node.id),
+                'expected a mapping node, but found {0}'.format(node.id),
                 node.start_mark
             )
         mapping = YAMLDict()
@@ -164,7 +164,7 @@ class YAMLDictLoader(yaml.Loader):
                 raise yaml.constructor.ConstructorError(
                     'while constructing a mapping',
                     node.start_mark,
-                    'found unacceptable key ({})'.format(exc),
+                    'found unacceptable key ({0})'.format(exc),
                     key_node.start_mark
                 )
             value = self.construct_object(value_node, deep=deep)
