@@ -16,7 +16,7 @@ test_requirements = [
 
 setup(
     name='yamlsettings',
-    version='0.2.4',
+    version='0.2.5',
     description='Yaml Settings Configuration Module',
     long_description=readme,
     author='Kyle James Walker',
@@ -29,10 +29,11 @@ setup(
     install_requires=requirements,
     license='MIT',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
+        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
     ],
