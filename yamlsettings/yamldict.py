@@ -23,7 +23,10 @@ class YAMLDict(collections.OrderedDict):
 
     def __getattr__(self, k):
         if not (k.startswith('__') or k.startswith('_OrderedDict__')):
-            return self[k]
+            try:
+                return self[k]
+            except KeyError:
+                raise AttributeError
         else:
             return super(YAMLDict, self).__getattr__(k)
 
