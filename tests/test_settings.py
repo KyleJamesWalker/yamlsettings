@@ -211,5 +211,6 @@ class YamlSettingsWithSectionsTestCase(unittest.TestCase):
             return callback
         pass
 
+
 if __name__ == '__main__':
     unittest.main()
