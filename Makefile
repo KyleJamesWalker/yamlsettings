@@ -8,27 +8,29 @@ all:
 	@echo "  tests3 - Run tests with python3"
 
 clean:
-	@rm -rf env2/ env3/ build/ *.egg-info *.egg
+	@rm -rf build/ *.egg-info *.egg
+	@pyenv virtualenv-delete -f yset-27
+	@pyenv virtualenv-delete -f yset-35
 	@find . -name '*.pyc' -delete
 	@find . -name '__pycache__' -delete
 
 env2:
-	virtualenv --python=python2 env2
-	env2/bin/pip install --upgrade pip setuptools pbr
-	env2/bin/pip install -e .
+	@pyenv virtualenv 2.7.14 yset-27 | True
+	PYENV_VERSION=yset-27 pip install --upgrade pip setuptools pbr
+	PYENV_VERSION=yset-27 pip install -e .
 
 tests2: env2
-	env2/bin/python setup.py test
+	PYENV_VERSION=yset-27 python setup.py test
 
 env3:
-	virtualenv --python=python3 env3
-	env3/bin/pip install --upgrade pip setuptools pbr
-	env3/bin/pip install -e .
+	@pyenv virtualenv 3.6.3 yset-36 | True
+	PYENV_VERSION=yset-36 pip install --upgrade pip setuptools pbr
+	PYENV_VERSION=yset-36 pip install -e .
 
 tests3: env3
-	env3/bin/python setup.py test
+	PYENV_VERSION=yset-36 python setup.py test
 
 tests: tests2 tests3
 
 build:
-	env3/bin/python setup.py build
+	PYENV_VERSION=yset-36 python setup.py build
