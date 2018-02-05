@@ -9,13 +9,13 @@ all:
 
 clean:
 	@rm -rf build/ *.egg-info *.egg
-	@pyenv virtualenv-delete -f yset-27
-	@pyenv virtualenv-delete -f yset-35
+	@pyenv uninstall -f yset-27 || True
+	@pyenv uninstall -f yset-36 || True
 	@find . -name '*.pyc' -delete
 	@find . -name '__pycache__' -delete
 
 env2:
-	@pyenv virtualenv 2.7.14 yset-27 | True
+	@pyenv virtualenv -f 2.7.14 yset-27 || True
 	PYENV_VERSION=yset-27 pip install --upgrade pip setuptools pbr
 	PYENV_VERSION=yset-27 pip install -e .
 
@@ -23,7 +23,7 @@ tests2: env2
 	PYENV_VERSION=yset-27 python setup.py test
 
 env3:
-	@pyenv virtualenv 3.6.3 yset-36 | True
+	@pyenv virtualenv -f 3.6.3 yset-36 || True
 	PYENV_VERSION=yset-36 pip install --upgrade pip setuptools pbr
 	PYENV_VERSION=yset-36 pip install -e .
 
