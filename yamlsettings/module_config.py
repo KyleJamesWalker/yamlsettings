@@ -58,6 +58,18 @@ def get_config(package: str, resource: str=None) -> \
         yamlsettings.update_from_env(app_settings)
         validate(app_settings)
 
+        # This would be an example of loading a custom init function, this
+        # would likely need to allow overridding.
+        try:
+            pkg_mod = pkgutil.get_loader(package).load_module()
+            if pkg_mod:
+                init_func = getattr(pkg_mod, 'init')
+        except AttributeError:
+            init_func = None
+
+        if init_func:
+            init_func(app_settings)
+
         _CONFIG[package][resource] = app_settings
 
     return _CONFIG[package][resource]
