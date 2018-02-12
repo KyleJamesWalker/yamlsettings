@@ -42,6 +42,9 @@ class YAMLDict(collections.OrderedDict):
         return '<' + ', '.join(['{0}: {1}'.format(repr(k), repr(v))
                                for k, v in self.items()]) + '>'
 
+    def __dir__(self):
+        return self.keys()
+
     def traverse(self, callback):
         ''' Traverse through all keys and values (in-order)
             and replace keys and values with the return values
