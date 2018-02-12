@@ -16,7 +16,7 @@ test_requirements = [
 
 setup(
     name='yamlsettings',
-    version='0.2.7',
+    version='0.2.8',
     description='Yaml Settings Configuration Module',
     long_description=readme,
     author='Kyle James Walker',
