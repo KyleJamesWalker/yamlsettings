@@ -5,18 +5,27 @@ except ImportError:
 
 readme = open('README.rst').read()
 
-requirements = [
-    "PyYAML",
-]
+requirements = {
+    "package": [
+        "PyYAML",
+    ],
+    "test": [
+        "nose",
+        "mock",
+        "pytest",
+        "pytest-mock",
+        "pytest-pudb",
+    ],
+    "setup": [
+        "pytest-runner",
+    ],
+}
 
-test_requirements = [
-    "nose",
-    "mock",
-]
+requirements.update(all=sorted(set().union(*requirements.values())))
 
 setup(
     name='yamlsettings',
-    version='0.2.8',
+    version='1.0.0',
     description='Yaml Settings Configuration Module',
     long_description=readme,
     author='Kyle James Walker',
@@ -26,7 +35,9 @@ setup(
     package_dir={'yamlsettings':
                  'yamlsettings'},
     include_package_data=True,
-    install_requires=requirements,
+    install_requires=requirements['package'],
+    extras_require=requirements,
+    setup_requires=requirements['setup'],
     license='MIT',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -39,5 +50,5 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     test_suite='tests',
-    tests_require=test_requirements
+    tests_require=requirements['test'],
 )

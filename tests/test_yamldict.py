@@ -42,6 +42,29 @@ class YamlDictTestCase(unittest.TestCase):
         self.assertEqual(test_defaults.config.leave, 'Goodbye')
         self.assertEqual(test_defaults.config.secret, 'I have no secrets')
         self.assertEqual(test_defaults.config.meaning, 42)
+        # Verify missing raises an AttributeError and not a KeyError
+        self.assertRaises(AttributeError, getattr, test_defaults, 'missing')
+        # Verify access to class attributes
+        self.assertEqual(str(test_defaults.__class__),
+                         "<class 'yamlsettings.yamldict.YAMLDict'>")
+        # Test dir access of keys for tab complete
+        self.assertEqual(dir(test_defaults.config),
+                         ['greet', 'leave', 'meaning', 'secret'])
+        # Test representation of value
+        self.assertEqual(
+            str(test_defaults.config),
+            'greet: Hello\nleave: Goodbye\nsecret: I have no secrets\n'
+            'meaning: 42\n',
+        )
+        self.assertEqual(
+            repr(test_defaults.config),
+            "{'greet': 'Hello', 'leave': 'Goodbye', "
+            "'secret': 'I have no secrets', 'meaning': 42}",
+        )
+        # Test foo is saved in keys
+        test_defaults.foo = 'bar'
+        self.assertEqual(test_defaults.foo, 'bar')
+        self.assertEqual(test_defaults['foo'], 'bar')
 
     def test_load_first_found(self):
         test_settings = load(['missing.yml', 'defaults.yml', 'settings.yml'])
@@ -83,6 +106,9 @@ class YamlDictTestCase(unittest.TestCase):
         test_settings = load('settings.yml')
         test_settings.limit(['config'])
         self.assertEqual(list(test_settings), ['config'])
+        test_settings2 = load('settings.yml')
+        test_settings2.limit('config')
+        self.assertEqual(list(test_settings), list(test_settings2))
 
     def test_clone_changes_isolated(self):
         test_settings = load('defaults.yml')
@@ -92,18 +118,19 @@ class YamlDictTestCase(unittest.TestCase):
                             test_clone.config.greet)
 
     def test_load_all(self):
-        section_count = 0
-        for cur_yml in load_all('fancy.yml'):
-            if section_count is 0:
-                self.assertEqual(cur_yml.test.id1.name, 'hi')
-                self.assertEqual(cur_yml.test.test[2].sub_test.a, 10)
-                self.assertEqual(cur_yml.test.test[2].sub_test.b.name, 'hi')
-            elif section_count is 1:
-                self.assertEqual(cur_yml.test_2.test2.message, 'same here')
-            elif section_count is 2:
-                self.assertEqual(cur_yml.test_3.test.name, 'Hello')
-            section_count += 1
-        self.assertEqual(section_count, 3)
+        for test_input in ['fancy.yml', ['fancy.yml']]:
+            section_count = 0
+            for c_yml in load_all(test_input):
+                if section_count is 0:
+                    self.assertEqual(c_yml.test.id1.name, 'hi')
+                    self.assertEqual(c_yml.test.test[2].sub_test.a, 10)
+                    self.assertEqual(c_yml.test.test[2].sub_test.b.name, 'hi')
+                elif section_count is 1:
+                    self.assertEqual(c_yml.test_2.test2.message, 'same here')
+                elif section_count is 2:
+                    self.assertEqual(c_yml.test_3.test.name, 'Hello')
+                section_count += 1
+            self.assertEqual(section_count, 3)
 
     def test_save_all(self):
         cur_ymls = load_all('fancy.yml')
@@ -193,6 +220,13 @@ class YamlDictTestCase(unittest.TestCase):
         # Verify whoami was properly overridden
         self.assertEqual(test_settings.base.whoami, "base")
         self.assertEqual(test_settings.merged.whoami, "merged")
+
+    def test_list_replace_on_update(self):
+        test_defaults = load('defaults.yml')
+        test_defaults.update({'a': [1, 2, 3]})
+        self.assertEqual(test_defaults.a, [1, 2, 3])
+        test_defaults.update({'a': (4,)})
+        self.assertEqual(test_defaults.a, (4,))
 
 
 if __name__ == '__main__':

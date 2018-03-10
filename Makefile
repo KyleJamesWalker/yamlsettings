@@ -1,7 +1,13 @@
+debug ?= false
+
+ifeq ($(debug),true)
+	test_extra_params := -- --pudb
+else
+	test_extra_params :=
+endif
+
 clean:
-	@rm -rf build/ *.egg-info *.egg
-	@pyenv uninstall -f yset-27 || True
-	@pyenv uninstall -f yset-36 || True
+	@rm -rf build/ .tox/ *.egg-info *.egg
 	@find . -name '*.pyc' -delete
 	@find . -name '__pycache__' -delete
 
@@ -14,18 +20,10 @@ pyenv_envs:
 	pyenv local 2.7.14 3.4.3 3.5.4 3.6.3
 	pip install -U detox tox tox-pyenv pip setuptools
 
+test3:
+	-tox -e py36 $(test_extra_params)
 
-env3:
-	@pyenv virtualenv -f 3.6.3 yset-36 || True
-	PYENV_VERSION=yset-36 pip install --upgrade pip setuptools pbr flake8 coverage
-	PYENV_VERSION=yset-36 pip install -e .
-
-tests3:
-	PYENV_VERSION=yset-36 flake8
-	PYENV_VERSION=yset-36 coverage run setup.py test
-	PYENV_VERSION=yset-36 coverage report -m
-
-tests:
+test:
 	detox
 
 build:
