@@ -17,11 +17,13 @@ pyenv_envs:
 
 env3:
 	@pyenv virtualenv -f 3.6.3 yset-36 || True
-	PYENV_VERSION=yset-36 pip install --upgrade pip setuptools pbr
+	PYENV_VERSION=yset-36 pip install --upgrade pip setuptools pbr flake8 coverage
 	PYENV_VERSION=yset-36 pip install -e .
 
-tests3: env3
-	PYENV_VERSION=yset-36 python setup.py test
+tests3:
+	PYENV_VERSION=yset-36 flake8
+	PYENV_VERSION=yset-36 coverage run setup.py test
+	PYENV_VERSION=yset-36 coverage report -m
 
 tests:
 	detox
