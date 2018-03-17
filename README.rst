@@ -1,6 +1,11 @@
 YamlSettings
 ------------
 
+.. image:: https://travis-ci.org/KyleJamesWalker/yamlsettings.svg?branch=master
+    :target: https://travis-ci.org/KyleJamesWalker/yamlsettings
+.. image:: https://codecov.io/gh/KyleJamesWalker/yamlsettings/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/KyleJamesWalker/yamlsettings
+
 A Yaml Settings Configuration Module.
 
 A library to help manage project settings, without having to worry about
