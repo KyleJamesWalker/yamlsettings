@@ -7,7 +7,7 @@ else
 endif
 
 clean:
-	@rm -rf build/ .tox/ *.egg-info *.egg
+	@rm -rf build/ .tox/ .eggs/ .pytest_cache/ *.egg-info *.egg coverage.xml
 	@find . -name '*.pyc' -delete
 	@find . -name '__pycache__' -delete
 
