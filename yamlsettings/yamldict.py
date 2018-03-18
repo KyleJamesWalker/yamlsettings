@@ -1,6 +1,4 @@
-"""Copyright (c) 2015 Kyle James Walker
-
-See the file LICENSE for copying permission.
+"""Order-preserved, attribute-accessible dictionary object for YAML files
 
 """
 # -*- coding: utf-8 -*-
@@ -18,17 +16,17 @@ class YAMLDict(collections.OrderedDict):
 
     def __init__(self, *args, **kwargs):
         super(YAMLDict, self).__init__(*args, **kwargs)
-        # Reset types of all sub-nodes through the hiearchy
+        # Reset types of all sub-nodes through the hierarchy
         self.update(self)
 
-    def __getattr__(self, k):
-        if not (k.startswith('__') or k.startswith('_OrderedDict__')):
+    def __getattribute__(self, k):
+        try:
+            return super(YAMLDict, self).__getattribute__(k)
+        except AttributeError:
             try:
                 return self[k]
             except KeyError:
                 raise AttributeError
-        else:
-            return super(YAMLDict, self).__getattr__(k)
 
     def __setattr__(self, k, v):
         if k.startswith('_OrderedDict__'):
@@ -39,8 +37,8 @@ class YAMLDict(collections.OrderedDict):
         return dump(self, stream=None, default_flow_style=False)
 
     def __repr__(self):
-        return '<' + ', '.join(['{0}: {1}'.format(repr(k), repr(v))
-                               for k, v in self.items()]) + '>'
+        return '{' + ', '.join(['{0}: {1}'.format(repr(k), repr(v))
+                               for k, v in self.items()]) + '}'
 
     def __dir__(self):
         return self.keys()
@@ -77,7 +75,7 @@ class YAMLDict(collections.OrderedDict):
                 if isinstance(update_node, YAMLDict) or \
                         isinstance(update_node, dict):
                     if not (isinstance(base_node, YAMLDict)):
-                        # NOTE: A regular dictionay is replaced by a new
+                        # NOTE: A regular dictionary is replaced by a new
                         #       YAMLDict object.
                         new_node = YAMLDict()
                     else:
