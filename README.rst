@@ -197,3 +197,7 @@ usage
 
  import yamlsettings
  yamlsettings.load("zxc://defaults.yaml", foo='bar')
+
+ # Note: this is automatically detected when the extension is installed
+ # alternatively the extension can be manually registered with:
+ yamlsettings.registry.add(ZxcExtension)
