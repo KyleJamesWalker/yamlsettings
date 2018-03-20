@@ -25,13 +25,13 @@ requirements.update(all=sorted(set().union(*requirements.values())))
 
 setup(
     name='yamlsettings',
-    version='1.0.0',
+    version='1.0.1',
     description='Yaml Settings Configuration Module',
     long_description=readme,
     author='Kyle James Walker',
     author_email='KyleJamesWalker@gmail.com',
     url='https://github.com/KyleJamesWalker/yamlsettings',
-    packages=['yamlsettings'],
+    packages=['yamlsettings', 'yamlsettings.extensions'],
     package_dir={'yamlsettings':
                  'yamlsettings'},
     include_package_data=True,
