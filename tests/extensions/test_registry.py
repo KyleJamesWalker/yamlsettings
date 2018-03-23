@@ -1,12 +1,12 @@
 """Test registry"""
 import pytest
 import yamlsettings
+from yamlsettings.extensions.base import YamlSettingsExtension
 from yamlsettings.extensions.registry import ExtensionRegistry
-
 from mock import Mock
 
 
-class MockExtension(yamlsettings.YamlSettingsExtension):
+class MockExtension(YamlSettingsExtension):
     protocols = ['mock']
 
     @classmethod
@@ -16,7 +16,7 @@ class MockExtension(yamlsettings.YamlSettingsExtension):
         return load_method("mock: test")
 
 
-class MockExtension2(yamlsettings.YamlSettingsExtension):
+class MockExtension2(YamlSettingsExtension):
     protocols = ['mock2']
 
     @classmethod

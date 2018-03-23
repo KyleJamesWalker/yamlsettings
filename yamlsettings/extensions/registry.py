@@ -26,7 +26,7 @@ class ExtensionRegistry(object):
         """A registry that stores extensions to open and parse Target URIs
 
         :param extensions: A list of extensions.
-        :type extensions: yamlsettings.extensions.YamlSettingsExtension
+        :type extensions: yamlsettings.extensions.base.YamlSettingsExtension
 
         """
         self.registry = {}
@@ -61,7 +61,7 @@ class ExtensionRegistry(object):
         """Adds an extension to the registry
 
         :param extension: Extension object
-        :type extension: yamlsettings.extensions.YamlSettingsExtension
+        :type extension: yamlsettings.extensions.base.YamlSettingsExtension
 
         """
         index = len(self.extensions)

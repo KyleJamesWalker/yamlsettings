@@ -1,5 +1,5 @@
 """Load a yaml from from the local filesystem"""
-from yamlsettings.extensions import YamlSettingsExtension
+from yamlsettings.extensions.base import YamlSettingsExtension
 
 
 class LocalExtension(YamlSettingsExtension):

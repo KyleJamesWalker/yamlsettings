@@ -15,7 +15,6 @@ from yamlsettings.helpers import (
 from yamlsettings.extensions import (
     registry,
     RegistryError,
-    YamlSettingsExtension,
 )
 
 load = registry.load
@@ -32,5 +31,4 @@ __all__ = [
     'YamlSettings',
     'registry',
     'RegistryError',
-    'YamlSettingsExtension',
 ]
