@@ -6,7 +6,6 @@ Proposed types:
       each://defaults.yaml|settings.yaml|more.yaml
 
 """
-from yamlsettings.extensions.base import YamlSettingsExtension
 from yamlsettings.extensions.local import LocalExtension
 from yamlsettings.extensions.package import PackageExtension
 from yamlsettings.extensions.registry import ExtensionRegistry, RegistryError
@@ -16,4 +15,4 @@ registry = ExtensionRegistry([
     PackageExtension,
 ])
 
-__all__ = ['registry', 'YamlSettingsExtension', 'RegistryError']
+__all__ = ['registry', 'RegistryError']

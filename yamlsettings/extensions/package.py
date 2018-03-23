@@ -2,7 +2,7 @@
 import pkgutil
 
 import yamlsettings
-from yamlsettings.extensions import YamlSettingsExtension
+from yamlsettings.extensions.base import YamlSettingsExtension
 
 
 class PackageExtension(YamlSettingsExtension):

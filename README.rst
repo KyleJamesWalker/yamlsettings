@@ -160,6 +160,7 @@ setup.py
      author='Kyle Walker',
      author_email='KyleJamesWalker@gmail.com',
      description='Quick Example',
+     requirements=['yamlsettings'],
      py_modules=['yamlsettings_example'],
      entry_points={
          'yamlsettings10': [
@@ -172,10 +173,10 @@ yamlsettings_example.py
 
 .. code-block:: python
 
- import yamlsettings
+ from yamlsettings.extensions.base import YamlSettingsExtension
 
 
- class ZxcExtension(yamlsettings.YamlSettingsExtension):
+ class ZxcExtension(YamlSettingsExtension):
      """Quick Example Plugin
 
      Standard file opener, but will merge in values passed to kwargs
