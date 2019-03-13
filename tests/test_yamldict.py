@@ -121,13 +121,13 @@ class YamlDictTestCase(unittest.TestCase):
         for test_input in ['fancy.yml', ['fancy.yml']]:
             section_count = 0
             for c_yml in load_all(test_input):
-                if section_count is 0:
+                if section_count == 0:
                     self.assertEqual(c_yml.test.id1.name, 'hi')
                     self.assertEqual(c_yml.test.test[2].sub_test.a, 10)
                     self.assertEqual(c_yml.test.test[2].sub_test.b.name, 'hi')
-                elif section_count is 1:
+                elif section_count == 1:
                     self.assertEqual(c_yml.test_2.test2.message, 'same here')
-                elif section_count is 2:
+                elif section_count == 2:
                     self.assertEqual(c_yml.test_3.test.name, 'Hello')
                 section_count += 1
             self.assertEqual(section_count, 3)

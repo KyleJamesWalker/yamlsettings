@@ -11,20 +11,11 @@ clean:
 	@find . -name '*.pyc' -delete
 	@find . -name '__pycache__' -delete
 
-pyenv_envs:
-	pip install -U detox tox tox-pyenv
-	CFLAGS="-I$(shell brew --prefix openssl)/include" LDFLAGS="-L$(shell brew --prefix openssl)/lib" pyenv install 2.7.14
-	CFLAGS="-I$(shell brew --prefix openssl)/include" LDFLAGS="-L$(shell brew --prefix openssl)/lib" pyenv install 3.4.3
-	CFLAGS="-I$(shell brew --prefix openssl)/include" LDFLAGS="-L$(shell brew --prefix openssl)/lib" pyenv install 3.5.4
-	CFLAGS="-I$(shell brew --prefix openssl)/include" LDFLAGS="-L$(shell brew --prefix openssl)/lib" pyenv install 3.6.3
-	pyenv local 2.7.14 3.4.3 3.5.4 3.6.3
-	pip install -U detox tox tox-pyenv pip setuptools
-
 test3:
-	-tox -e py36 $(test_extra_params)
+	-tox -e py37 $(test_extra_params)
 
 test:
-	detox
+	tox -p auto
 
 build:
-	PYENV_VERSION=yset-36 python setup.py build
+	PYENV_VERSION=ys-dev python setup.py build
