@@ -28,7 +28,7 @@ class YamlSettingsExtension:
         for key, vals in query.items():
             # Multiple values of the same name could be passed use first
             # Also params without strings will be treated as true values
-            query[key] = yaml.load(vals[0] or 'true')
+            query[key] = yaml.load(vals[0] or 'true', Loader=yaml.FullLoader)
 
         # If expected, populate with defaults
         for key, val in cls.default_query.items():
