@@ -7,7 +7,7 @@ readme = open('README.rst').read()
 
 requirements = {
     "package": [
-        "PyYAML<4",
+        "PyYAML>=5",
     ],
     "test": [
         "nose",
@@ -25,7 +25,7 @@ requirements.update(all=sorted(set().union(*requirements.values())))
 
 setup(
     name='yamlsettings',
-    version='1.0.3',
+    version='2.0.0',
     description='Yaml Settings Configuration Module',
     long_description=readme,
     author='Kyle James Walker',

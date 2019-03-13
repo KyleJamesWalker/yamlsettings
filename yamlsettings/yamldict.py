@@ -82,8 +82,9 @@ class YAMLDict(collections.OrderedDict):
                     new_node = base_node
                 for k, v in update_node.items():
                     new_node[k] = _update_node(new_node.get(k), v)
-            elif isinstance(update_node, list) or \
-                    isinstance(update_node, tuple):
+            elif isinstance(update_node, list) or isinstance(
+                update_node, tuple
+            ):
                 # NOTE: A list/tuple is replaced by a new list/tuple.
                 new_node = []
                 for v in update_node:
@@ -125,7 +126,7 @@ class YAMLDict(collections.OrderedDict):
             self.pop(k)
 
 
-class YAMLDictLoader(yaml.Loader):
+class YAMLDictLoader(yaml.FullLoader, yaml.constructor.UnsafeConstructor):
     '''
     Loader for YAMLDict object
     Adopted from:
@@ -133,7 +134,7 @@ class YAMLDictLoader(yaml.Loader):
     '''
 
     def __init__(self, *args, **kwargs):
-        yaml.Loader.__init__(self, *args, **kwargs)
+        super(YAMLDictLoader, self).__init__(*args, **kwargs)
         # override constructors for maps (i.e. dictionaries)
         self.add_constructor(u'tag:yaml.org,2002:map',
                              type(self).construct_yaml_map)
@@ -242,8 +243,8 @@ class YAMLDictDumper(yaml.emitter.Emitter,
                  default_style=None, default_flow_style=None,
                  canonical=None, indent=None, width=None,
                  allow_unicode=None, line_break=None,
-                 encoding=None, explicit_start=None, explicit_end=None,
-                 version=None, tags=None):
+                 encoding=None, version=None, tags=None,
+                 explicit_start=None, explicit_end=None, sort_keys=None):
         yaml.emitter.Emitter.__init__(self, stream, canonical=canonical,
                                       indent=indent, width=width,
                                       allow_unicode=allow_unicode,
@@ -259,17 +260,27 @@ class YAMLDictDumper(yaml.emitter.Emitter,
         yaml.resolver.Resolver.__init__(self)
 
 
-def dump(data, stream=None, **kwds):
+def dump(data, stream=None, **kwargs):
     """
     Serialize YAMLDict into a YAML stream.
     If stream is None, return the produced string instead.
     """
-    return yaml.dump_all([data], stream, Dumper=YAMLDictDumper, **kwds)
+    return yaml.dump_all(
+        [data],
+        stream=stream,
+        Dumper=YAMLDictDumper,
+        **kwargs
+    )
 
 
-def dump_all(data_list, stream=None, **kwds):
+def dump_all(data_list, stream=None, **kwargs):
     """
     Serialize YAMLDict into a YAML stream.
     If stream is None, return the produced string instead.
     """
-    return yaml.dump_all(data_list, stream, Dumper=YAMLDictDumper, **kwds)
+    return yaml.dump_all(
+        data_list,
+        stream=stream,
+        Dumper=YAMLDictDumper,
+        **kwargs
+    )
