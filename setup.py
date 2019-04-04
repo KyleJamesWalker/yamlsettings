@@ -26,7 +26,7 @@ requirements.update(all=sorted(set().union(*requirements.values())))
 
 setup(
     name='yamlsettings',
-    version='2.0.0',
+    version='2.0.1',
     description='Yaml Settings Configuration Module',
     long_description=readme,
     author='Kyle James Walker',
