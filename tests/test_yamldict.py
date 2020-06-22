@@ -12,7 +12,7 @@ import unittest
 
 from mock import mock_open
 from yamlsettings import (load, load_all, save_all,
-                          update_from_env, update_from_file)
+                          update_from_env, update_from_file, yamldict)
 
 from . import builtin_module, path_override, open_override, isfile_override
 
@@ -227,6 +227,14 @@ class YamlDictTestCase(unittest.TestCase):
         self.assertEqual(test_defaults.a, [1, 2, 3])
         test_defaults.update({'a': (4,)})
         self.assertEqual(test_defaults.a, (4,))
+
+    @mock.patch.dict('os.environ', {'FOO_BAR': 'new-baz'})
+    def test_dash_vars_with_env(self):
+        """Test items with dashes can be overritten with env"""
+        test_settings = yamldict.YAMLDict({'foo-bar': 'baz'})
+        assert test_settings['foo-bar'] == 'baz'
+        update_from_env(test_settings)
+        assert test_settings['foo-bar'] == 'new-baz'
 
 
 if __name__ == '__main__':
