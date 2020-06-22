@@ -2,7 +2,9 @@
 
 """
 import pytest
+import yaml
 import yamlsettings
+
 from yamlsettings.extensions.package import PackageExtension
 from yamlsettings.extensions.registry import ExtensionRegistry
 
@@ -48,6 +50,21 @@ def test_package_config(package_data, data_input):
     cfg = yamlsettings.load('package://example')
     assert cfg.mocked.startswith("package")
     assert package_data.call_count == 1
+
+
+def test_load_all(package_data):
+    """Verify load_all works"""
+    package_data.return_value = b'---\nfoo: first\n---\nfoo: second'
+
+    # Verify failure with single load
+    with pytest.raises(yaml.composer.ComposerError):
+        yamlsettings.load('package://example')
+
+    # Load all segments
+    cfg = yamlsettings.load_all('package://example')
+    assert cfg[0].foo == 'first'
+    assert cfg[1].foo == 'second'
+    assert len(cfg) == 2
 
 
 def test_no_package_data(package_data):

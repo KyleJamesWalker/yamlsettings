@@ -1,5 +1,6 @@
 """Load a yaml resource from a python package."""
 import pkgutil
+import types
 
 import yamlsettings
 from yamlsettings.extensions.base import YamlSettingsExtension
@@ -49,7 +50,14 @@ class PackageExtension(YamlSettingsExtension):
                 raise IOError("package - {}:{}".format(package_path, resource))
 
             yaml_contents = load_method(pkg_data)
-            if env:
+            # Load all returns a generator list of configurations
+            many = isinstance(yaml_contents, types.GeneratorType)
+            yaml_contents = list(yaml_contents) if many else yaml_contents
+
+            if env and many:
+                for contents in yaml_contents:
+                    yamlsettings.update_from_env(contents, prefix)
+            elif env:
                 yamlsettings.update_from_env(yaml_contents, prefix)
 
             if persist:

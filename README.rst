@@ -189,7 +189,17 @@ yamlsettings_example.py
                      load_method, **kwargs):
          full_path = (hostname or '') + path
          obj = load_method(open(full_path, **query))
-         obj.update(kwargs)
+
+         # Load all returns a generator list of configurations
+         many = isinstance(obj, types.GeneratorType)
+         obj = list(obj) if many else obj
+
+         if many:
+             for x in obj:
+                 x.update(kwargs)
+         else:
+             obj.update(kwargs)
+
          return obj
 
 usage
