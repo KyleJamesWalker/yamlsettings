@@ -49,7 +49,7 @@ def update_from_env(yaml_dict, prefix=None):
         env_path = "{0}{1}{2}".format(
             prefix.upper(),
             '_' if prefix else '',
-            '_'.join([str(key).upper() for key in path])
+            '_'.join([str(key).replace('-', '_').upper() for key in path])
         )
         env_val = os.environ.get(env_path, None)
         if env_val is not None:
