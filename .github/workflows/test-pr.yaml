@@ -1,4 +1,4 @@
-name: Python package
+name: Test package
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
     strategy:
