@@ -78,14 +78,27 @@ jobs:
           ./dist/*.tar.gz
           ./dist/*.whl
 
+    - name: Check if release exists
+      id: check_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if gh release list --repo "${{ github.repository }}" | grep -q "${{ github.ref_name }}"; then
+          echo "release_exists=true" >> $GITHUB_ENV
+        else
+          echo "release_exists=false" >> $GITHUB_ENV
+        fi
+
     - name: Create GitHub Release
+      if: env.release_exists == 'false'
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: >-
         gh release create
         '${{ github.ref_name }}'
         --repo '${{ github.repository }}'
-        --notes ""
+        --generate-notes
+        --latest
 
     - name: Upload artifact signatures to GitHub Release
       env:
