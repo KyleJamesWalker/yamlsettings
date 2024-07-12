@@ -7,15 +7,20 @@ else
 endif
 
 clean:
-	@rm -rf build/ .tox/ .eggs/ .pytest_cache/ *.egg-info *.egg coverage.xml
+	@rm -rf build/ .eggs/ .pytest_cache/ *.egg-info *.egg coverage.xml
 	@find . -name '*.pyc' -delete
 	@find . -name '__pycache__' -delete
 
-test3:
-	-tox -e py37 $(test_extra_params)
+create_envs:
+	- pyenv virtualenv 3.12.2 ys-312
+	PYENV_VERSION=ys-312 pip install -e ".[all]"
+
+	- pyenv virtualenv 3.8.2 ys-38
+	PYENV_VERSION=ys-38 pip install -e ".[all]"
 
 test:
-	tox -p auto
+	PYENV_VERSION=ys-38 pytest
+	PYENV_VERSION=ys-312 pytest
 
 build:
-	PYENV_VERSION=ys-dev python setup.py build
+	PYENV_VERSION=ys-312 python setup.py build

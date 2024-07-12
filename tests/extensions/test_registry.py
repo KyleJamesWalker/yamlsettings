@@ -30,14 +30,17 @@ class MockExtension2(YamlSettingsExtension):
 def base_registry(monkeypatch, mocker):
     """Clean registry with only a fresh package extension"""
 
-    entry_iter = mocker.patch('pkg_resources.iter_entry_points')
     # Test when object already created
     mock_call = Mock()
     mock_call.load.return_value = MockExtension()
     # Test when object needs to be called
     mock_call2 = Mock()
     mock_call2.load.return_value = MockExtension2
-    entry_iter.return_value = [mock_call, mock_call2]
+    mocker.patch.object(
+        ExtensionRegistry,
+        '_get_entry_points',
+        return_value=[mock_call, mock_call2]
+    )
 
     clean_reg = ExtensionRegistry([])
     monkeypatch.setattr(yamlsettings, 'load', clean_reg.load)

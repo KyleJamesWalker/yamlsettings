@@ -1,7 +1,10 @@
 """Extension registry, to allow easy opening of various types.
 
 """
-import pkg_resources
+try:
+    from importlib.metadata import entry_points
+except ImportError:
+    from importlib_metadata import entry_points # For Python < 3.8
 
 from six.moves.urllib.parse import urlsplit
 from six import string_types
@@ -36,9 +39,19 @@ class ExtensionRegistry(object):
             self.add(extension)
         self._discover()
 
+    def _get_entry_points(self):
+        """Get all entry points for yamlsettings10"""
+        ep = entry_points()
+        try:
+            points = ep.select(group='yamlsettings10')
+        except AttributeError:
+            # Compatibility fallback
+            points = ep.get('yamlsettings10', [])
+        return points
+
     def _discover(self):
         """Find and install all extensions"""
-        for ep in pkg_resources.iter_entry_points('yamlsettings10'):
+        for ep in self._get_entry_points():
             ext = ep.load()
             if callable(ext):
                 ext = ext()
